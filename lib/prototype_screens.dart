@@ -143,38 +143,15 @@ class OnboardingStartScreen extends StatelessWidget {
 }
 
 class HomeDashboardScreen extends StatelessWidget {
-  const HomeDashboardScreen({super.key, required this.onTabSelected});
-
-  final TabSelected onTabSelected;
+  const HomeDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return PrototypePage(
+      bottomPadding: 28,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _AiEngineGraphicCard(),
-          const SizedBox(height: 16),
-          const _HomeHeroCard(),
-          const SizedBox(height: 14),
-          const _SectionHeader(title: 'Build your career', action: '72% ready'),
-          const SizedBox(height: 10),
-          _ProfilePromptCard(
-            onTap: () => _push(context, const ProfileChecklistScreen()),
-          ),
-          const SizedBox(height: 14),
-          _LocationScopeCard(onTabSelected: onTabSelected),
-          const SizedBox(height: 14),
-          _OnTheGoCanvasCard(onTap: () => onTabSelected(4)),
-          const SizedBox(height: 14),
-          _JobDeliveryCard(onTabSelected: onTabSelected),
-          const SizedBox(height: 14),
-          _TopMatchesPreview(
-            onOpenJobs: () => onTabSelected(2),
-            onOpenJob: () =>
-                _push(context, JobDetailScreen(job: prototypeJobs.first)),
-          ),
-        ],
+        children: const [_AiEngineGraphicCard()],
       ),
     );
   }
@@ -1438,7 +1415,7 @@ class MatchieMenuScreen extends StatelessWidget {
                   right: Radius.circular(28),
                 ),
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  filter: MatchieStyle.glassBlur(active: true),
                   child: Container(
                     width: MediaQuery.sizeOf(context).width * 0.84,
                     constraints: const BoxConstraints(maxWidth: 390),
@@ -1448,7 +1425,7 @@ class MatchieMenuScreen extends StatelessWidget {
                       gradient: MatchieStyle.glassGradient(active: true),
                       border: Border(
                         right: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.16),
+                          color: MatchieStyle.glassBorder(active: true),
                         ),
                       ),
                       boxShadow: [
@@ -2027,9 +2004,35 @@ class PrototypePage extends StatelessWidget {
       color: MatchiePalette.ink,
       child: Container(
         decoration: const BoxDecoration(gradient: MatchieGradients.warmPage),
-        child: Padding(
-          padding: EdgeInsets.only(top: topInset),
-          child: scrollable ? SingleChildScrollView(child: content) : content,
+        child: Stack(
+          children: [
+            const Positioned(
+              top: -90,
+              right: -110,
+              child: _GlassBackdropLight(size: 240, color: MatchiePalette.cyan),
+            ),
+            const Positioned(
+              top: 210,
+              left: -130,
+              child: _GlassBackdropLight(
+                size: 280,
+                color: MatchiePalette.purple,
+              ),
+            ),
+            const Positioned(
+              bottom: -120,
+              right: -95,
+              child: _GlassBackdropLight(size: 260, color: MatchiePalette.pink),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.only(top: topInset),
+                child: scrollable
+                    ? SingleChildScrollView(child: content)
+                    : content,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -2104,6 +2107,37 @@ class MatchieHeader extends StatelessWidget {
   }
 }
 
+class _GlassBackdropLight extends StatelessWidget {
+  const _GlassBackdropLight({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 46, sigmaY: 46),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                color.withValues(alpha: 0.10),
+                color.withValues(alpha: 0.04),
+                Colors.transparent,
+              ],
+              stops: const [0, 0.52, 1],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _HeaderIconButton extends StatelessWidget {
   const _HeaderIconButton({
     required this.icon,
@@ -2117,14 +2151,20 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(icon, size: 27),
-      color: MatchiePalette.text,
-      tooltip: tooltip,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 38, height: 38),
-      visualDensity: VisualDensity.compact,
-      onPressed: onPressed,
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(14),
+        child: MatchieGlassSurface(
+          compact: true,
+          radius: 14,
+          width: 38,
+          height: 38,
+          blur: false,
+          child: Icon(icon, size: 24, color: MatchiePalette.text),
+        ),
+      ),
     );
   }
 }
@@ -2173,33 +2213,33 @@ class GradientButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(18),
-        child: Ink(
+        child: MatchieGlassSurface(
+          active: true,
+          radius: 18,
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-          decoration: BoxDecoration(
-            gradient: MatchieGradients.brand,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                color: MatchiePalette.red.withValues(alpha: 0.14),
-                blurRadius: 18,
-                offset: const Offset(0, 9),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: MatchieGradients.brand,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.26)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: _PrototypeText.button,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(icon, color: MatchiePalette.text, size: 18),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  label,
-                  style: _PrototypeText.button,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(icon, color: MatchiePalette.text, size: 18),
-            ],
+            ),
           ),
         ),
       ),
@@ -2221,17 +2261,34 @@ class OutlineActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: MatchiePalette.muted,
-        backgroundColor: MatchiePalette.glassSoft,
-        side: BorderSide(color: MatchieStyle.glassBorder()),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(18),
+        child: MatchieGlassSurface(
+          compact: true,
+          radius: 18,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 19, color: MatchiePalette.muted),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  style: _PrototypeText.button.copyWith(
+                    color: MatchiePalette.muted,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      icon: Icon(icon, size: 19),
-      label: Text(label, overflow: TextOverflow.ellipsis),
     );
   }
 }
@@ -2293,14 +2350,10 @@ class _GlowPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return MatchieGlassSurface(
+      active: true,
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: MatchieGradients.panelGlow,
-        borderRadius: BorderRadius.circular(MatchieStyle.radius),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-      ),
       child: child,
     );
   }
@@ -2387,309 +2440,23 @@ class _StepCard extends StatelessWidget {
   }
 }
 
-class _ProfilePromptCard extends StatelessWidget {
-  const _ProfilePromptCard({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(MatchieStyle.radius),
-        child: Ink(
-          padding: const EdgeInsets.all(18),
-          decoration: MatchieStyle.panel(active: true),
-          child: Row(
-            children: [
-              const _IconBubble(icon: Icons.manage_accounts_outlined),
-              const SizedBox(width: 14),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Complete your profile',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _PrototypeText.title,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Better matches when we know the full you. Add your CV, references, and socials.',
-                      style: _PrototypeText.body,
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right, color: MatchiePalette.purple),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeHeroCard extends StatelessWidget {
-  const _HomeHeroCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: MatchieGradients.panelGlow,
-        borderRadius: BorderRadius.circular(MatchieStyle.radius),
-        border: Border.all(color: MatchieStyle.glassBorder(active: true)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 62,
-            height: 62,
-            decoration: BoxDecoration(
-              color: MatchiePalette.purple.withValues(alpha: 0.18),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                'CJ',
-                style: TextStyle(
-                  fontFamily: 'Playfair Display',
-                  color: MatchiePalette.purple,
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Chetan Jain', style: MatchieStyle.screenTitle),
-                SizedBox(height: 5),
-                Text(
-                  'Frontend Engineer · Bangalore',
-                  style: _PrototypeText.lead,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _AiEngineGraphicCard extends StatelessWidget {
   const _AiEngineGraphicCard();
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(MatchieStyle.radius),
-      child: Container(
-        decoration: MatchieStyle.panel(active: true),
-        child: Stack(
-          children: [
-            const AspectRatio(
-              aspectRatio: 0.72,
-              child: Image(
-                image: AssetImage('assets/images/matchie_ai_engine.jpeg'),
-                fit: BoxFit.cover,
-                alignment: Alignment(0, -0.34),
-              ),
-            ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      MatchiePalette.ink.withValues(alpha: 0.20),
-                      MatchiePalette.ink.withValues(alpha: 0.88),
-                    ],
-                    stops: const [0.42, 0.72, 1],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  _GradientKicker('What we read'),
-                  SizedBox(height: 6),
-                  Text(
-                    'The whole you, not just a CV.',
-                    style: MatchieStyle.brandTitle,
-                  ),
-                  SizedBox(height: 7),
-                  Text(
-                    'Matchie reads your socials, CV, references, goals, and proof before building jobs, CVs, cover letters, and prep.',
-                    style: _PrototypeText.body,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LocationScopeCard extends StatelessWidget {
-  const _LocationScopeCard({required this.onTabSelected});
-
-  final TabSelected onTabSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: MatchieStyle.panel(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              _IconBubble(icon: Icons.location_on_outlined),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Bangalore', style: _PrototypeText.title),
-                    SizedBox(height: 4),
-                    Text(
-                      'Searching from this location',
-                      style: _PrototypeText.body,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          GradientButton(
-            label: 'Use current location',
-            icon: Icons.near_me_outlined,
-            onPressed: () => onTabSelected(4),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Job titles you are searching',
-            style: _PrototypeText.title,
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _TagChip(
-                label: 'Frontend Engineer',
-                active: true,
-                onTap: () => onTabSelected(2),
-              ),
-              _TagChip(label: 'Product Manager', onTap: () => onTabSelected(2)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _JobDeliveryCard extends StatelessWidget {
-  const _JobDeliveryCard({required this.onTabSelected});
-
-  final TabSelected onTabSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: MatchieStyle.panel(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(Icons.work_outline_rounded, color: MatchiePalette.purple),
-              SizedBox(width: 10),
-              Text('Job Delivery', style: _PrototypeText.title),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Press to search, score, and deliver jobs matched to your profile.',
-            style: _PrototypeText.body,
-          ),
-          const SizedBox(height: 16),
-          GradientButton(
-            label: 'Deliver Today\'s Jobs',
-            icon: Icons.flash_on_outlined,
-            onPressed: () => onTabSelected(2),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TopMatchesPreview extends StatelessWidget {
-  const _TopMatchesPreview({required this.onOpenJobs, required this.onOpenJob});
-
-  final VoidCallback onOpenJobs;
-  final VoidCallback onOpenJob;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onOpenJobs,
-        borderRadius: BorderRadius.circular(MatchieStyle.radius),
-        child: Ink(
-          padding: const EdgeInsets.all(16),
-          decoration: MatchieStyle.panel(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: const [
-                  Icon(Icons.work_outline, color: MatchiePalette.purple),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Your Job Matches',
-                      style: _PrototypeText.title,
-                    ),
-                  ),
-                  Text('20', style: _PrototypeText.title),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text('Top Matches', style: _PrototypeText.small),
-              const SizedBox(height: 8),
-              for (final job in prototypeJobs.take(3)) ...[
-                _CompactJobRow(job: job, onTap: onOpenJob),
-                const SizedBox(height: 8),
-              ],
-            ],
+    return MatchieGlassSurface(
+      active: true,
+      width: double.infinity,
+      padding: const EdgeInsets.all(6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(MatchieStyle.radius - 6),
+        child: const AspectRatio(
+          aspectRatio: 779 / 1292,
+          child: Image(
+            image: AssetImage('assets/images/matchie_home_art.jpeg'),
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
           ),
         ),
       ),
@@ -2697,129 +2464,56 @@ class _TopMatchesPreview extends StatelessWidget {
   }
 }
 
-class _CompactJobRow extends StatelessWidget {
-  const _CompactJobRow({required this.job, required this.onTap});
+class _GlassChipBody extends StatelessWidget {
+  const _GlassChipBody({required this.label, required this.active});
 
-  final PrototypeJob job;
-  final VoidCallback onTap;
+  final String label;
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: MatchiePalette.glassSoft,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: MatchieStyle.glassBorder()),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    job.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _PrototypeText.title,
-                  ),
-                  const SizedBox(height: 3),
-                  Text(job.company, style: _PrototypeText.body),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            _ScorePill(score: job.score),
-          ],
-        ),
+    return Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: active ? MatchiePalette.text : MatchiePalette.muted,
+        fontSize: 12,
+        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+        letterSpacing: 0,
+        decoration: TextDecoration.none,
       ),
     );
   }
 }
 
-class _ScorePill extends StatelessWidget {
-  const _ScorePill({required this.score});
+class _GlassChipFrame extends StatelessWidget {
+  const _GlassChipFrame({
+    required this.label,
+    required this.active,
+    required this.tappable,
+  });
 
-  final int score;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: MatchiePalette.purple.withValues(alpha: 0.38),
-        ),
-      ),
-      child: Text(
-        '$score%',
-        style: const TextStyle(
-          color: MatchiePalette.text,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          decoration: TextDecoration.none,
-        ),
-      ),
-    );
-  }
-}
-
-class _OnTheGoCanvasCard extends StatelessWidget {
-  const _OnTheGoCanvasCard({required this.onTap});
-
-  final VoidCallback onTap;
+  final String label;
+  final bool active;
+  final bool tappable;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(MatchieStyle.radius),
-        child: Ink(
-          padding: const EdgeInsets.all(18),
-          decoration: MatchieStyle.panel(active: true),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  _GradientIcon(icon: Icons.navigation_outlined, size: 42),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Matchie on the Go',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _PrototypeText.title,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Walk past a hiring company. Get matched in real time.',
-                style: _PrototypeText.body,
-              ),
-              const SizedBox(height: 14),
-              _TagChip(
-                label: 'Included in your subscription',
-                active: true,
-                onTap: () => _showPrototypeSheet(
-                  context,
-                  title: 'Subscription included',
-                  body:
-                      'On the Go is included in the current prototype subscription.',
-                ),
-              ),
-            ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 170),
+      child: IntrinsicWidth(
+        child: MatchieGlassSurface(
+          compact: true,
+          active: active,
+          radius: 99,
+          height: 34,
+          padding: EdgeInsets.symmetric(
+            horizontal: tappable ? 13 : 11,
+            vertical: 0,
           ),
+          child: _GlassChipBody(label: label, active: active),
         ),
       ),
     );
@@ -2839,30 +2533,6 @@ class _SectionHeader extends StatelessWidget {
         Expanded(child: Text(title, style: _PrototypeText.title)),
         Text(action, style: _PrototypeText.small),
       ],
-    );
-  }
-}
-
-class _GradientKicker extends StatelessWidget {
-  const _GradientKicker(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) => MatchieGradients.brand.createShader(bounds),
-      child: Text(
-        label.toUpperCase(),
-        style: const TextStyle(
-          fontFamily: 'Space Grotesk',
-          color: Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 2,
-          decoration: TextDecoration.none,
-        ),
-      ),
     );
   }
 }
@@ -2925,14 +2595,11 @@ class _ActionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return MatchieGlassSurface(
+      compact: true,
+      radius: 99,
       constraints: const BoxConstraints(maxWidth: 92),
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: MatchieStyle.glassBorder()),
-      ),
       child: Text(
         label,
         maxLines: 1,
@@ -5540,16 +5207,13 @@ class _GradientIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return MatchieGlassSurface(
+      compact: true,
+      active: true,
+      radius: size * 0.32,
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(size * 0.32),
-        border: Border.all(
-          color: MatchiePalette.purple.withValues(alpha: 0.34),
-        ),
-      ),
+      blur: false,
       child: Icon(icon, color: MatchiePalette.purple, size: size * 0.52),
     );
   }
@@ -5562,16 +5226,12 @@ class _IconBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return MatchieGlassSurface(
+      compact: true,
+      radius: 14,
       width: 42,
       height: 42,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.11),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: MatchiePalette.purple.withValues(alpha: 0.28),
-        ),
-      ),
+      blur: false,
       child: Icon(icon, color: MatchiePalette.purple, size: 22),
     );
   }
@@ -5584,16 +5244,12 @@ class _FaIconBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return MatchieGlassSurface(
+      compact: true,
+      radius: 14,
       width: 42,
       height: 42,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.11),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: MatchiePalette.purple.withValues(alpha: 0.28),
-        ),
-      ),
+      blur: false,
       child: Center(
         child: FaIcon(icon, color: MatchiePalette.purple, size: 19),
       ),
@@ -5610,32 +5266,10 @@ class _TagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chip = Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: onTap == null ? 10 : 12,
-        vertical: onTap == null ? 7 : 9,
-      ),
-      decoration: BoxDecoration(
-        color: active
-            ? Colors.white.withValues(alpha: 0.16)
-            : MatchiePalette.glassSoft,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(
-          color: active
-              ? MatchiePalette.purple.withValues(alpha: 0.44)
-              : MatchieStyle.glassBorder(),
-        ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: active ? MatchiePalette.text : MatchiePalette.muted,
-          fontSize: 12,
-          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-          letterSpacing: 0,
-          decoration: TextDecoration.none,
-        ),
-      ),
+    final chip = _GlassChipFrame(
+      label: label,
+      active: active,
+      tappable: onTap != null,
     );
 
     if (onTap == null) {
@@ -5773,7 +5407,7 @@ void _showPrototypeSheet(
       return ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          filter: MatchieStyle.glassBlur(active: true),
           child: Container(
             decoration: BoxDecoration(
               gradient: MatchieStyle.glassGradient(active: true),
@@ -5781,7 +5415,7 @@ void _showPrototypeSheet(
                 top: Radius.circular(26),
               ),
               border: Border(
-                top: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
+                top: BorderSide(color: MatchieStyle.glassBorder(active: true)),
               ),
             ),
             child: SafeArea(

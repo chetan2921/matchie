@@ -19,8 +19,9 @@ void main() {
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Chetan Jain'), findsWidgets);
-    expect(find.textContaining('Build your career'), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
+    expect(find.text('The whole you, not just a CV.'), findsNothing);
+    expect(find.textContaining('Build your career'), findsNothing);
     expect(find.bySemanticsLabel('Home'), findsOneWidget);
     expect(find.bySemanticsLabel('Profile'), findsOneWidget);
     expect(find.bySemanticsLabel('Jobs'), findsOneWidget);

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +17,7 @@ class _MatchieShellState extends State<MatchieShell> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeDashboardScreen(onTabSelected: _selectTab),
+      const HomeDashboardScreen(),
       ProfileHubScreen(onTabSelected: _selectTab),
       JobMatchesScreen(onTabSelected: _selectTab),
       MatchieAiHomeScreen(onTabSelected: _selectTab),
@@ -31,10 +29,10 @@ class _MatchieShellState extends State<MatchieShell> {
     return MatchieMenuScope(
       onTabSelected: _selectTab,
       child: Scaffold(
-        extendBody: true,
+        extendBody: false,
         body: IndexedStack(index: _selectedIndex, children: screens),
         bottomNavigationBar: SafeArea(
-          minimum: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+          minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
           child: MatchieFloatingNav(
             selectedIndex: _selectedIndex,
             onSelected: _selectTab,
@@ -74,27 +72,23 @@ class MatchieFloatingNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      heightFactor: 1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 430),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-            decoration: BoxDecoration(
-              gradient: MatchieStyle.glassGradient(active: true),
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.34),
-                  blurRadius: 28,
-                  offset: const Offset(0, 14),
-                ),
-              ],
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final navWidth = constraints.maxWidth > 376
+            ? 376.0
+            : constraints.maxWidth;
+        final buttonSize = ((navWidth - 28) / _items.length)
+            .clamp(32.0, 39.0)
+            .toDouble();
+
+        return Center(
+          heightFactor: 1,
+          child: MatchieGlassSurface(
+            active: true,
+            radius: 28,
+            width: navWidth,
+            height: 58,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -102,13 +96,14 @@ class MatchieFloatingNav extends StatelessWidget {
                   _NavButton(
                     item: _items[i],
                     selected: selectedIndex == i,
+                    size: buttonSize,
                     onTap: () => onSelected(i),
                   ),
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -124,44 +119,52 @@ class _NavButton extends StatelessWidget {
   const _NavButton({
     required this.item,
     required this.selected,
+    required this.size,
     required this.onTap,
   });
 
   final _NavItem item;
   final bool selected;
+  final double size;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: item.label,
-      child: Tooltip(
-        message: item.label,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(99),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut,
-            width: 41,
-            height: 41,
-            decoration: BoxDecoration(
-              color: selected
-                  ? Colors.white.withValues(alpha: 0.16)
-                  : Colors.transparent,
-              shape: BoxShape.circle,
-              border: selected
-                  ? Border.all(color: Colors.white.withValues(alpha: 0.22))
-                  : null,
-            ),
-            child: FaIcon(
-              item.icon,
-              color: selected
-                  ? MatchiePalette.text
-                  : MatchiePalette.muted.withValues(alpha: 0.82),
-              size: 20,
+    final iconSize = (size * 0.50).clamp(17.0, 19.0).toDouble();
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: item.label,
+        child: Tooltip(
+          message: item.label,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(99),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              decoration: BoxDecoration(
+                color: selected
+                    ? MatchiePalette.purple.withValues(alpha: 0.24)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+                border: selected
+                    ? Border.all(
+                        color: MatchiePalette.purple.withValues(alpha: 0.36),
+                      )
+                    : null,
+              ),
+              child: Center(
+                child: FaIcon(
+                  item.icon,
+                  color: selected ? MatchiePalette.text : MatchiePalette.faint,
+                  size: iconSize,
+                ),
+              ),
             ),
           ),
         ),
