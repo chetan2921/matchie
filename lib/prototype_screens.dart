@@ -147,11 +147,40 @@ class HomeDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PrototypePage(
-      bottomPadding: 28,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [_AiEngineGraphicCard()],
+    return Material(
+      color: MatchiePalette.ink,
+      child: Container(
+        decoration: const BoxDecoration(gradient: MatchieGradients.warmPage),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 86),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: MatchieStyle.maxContentWidth,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: const [
+                  _HomeCityHero(),
+                  SizedBox(height: 14),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MatchieStyle.pagePadding,
+                    ),
+                    child: _AiEngineGraphicCard(),
+                  ),
+                  SizedBox(height: 14),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MatchieStyle.pagePadding,
+                    ),
+                    child: _HomeDownloadFooter(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1993,7 +2022,7 @@ class PrototypePage extends StatelessWidget {
             MatchieStyle.pagePadding,
             showHeader ? 4 : 12,
             MatchieStyle.pagePadding,
-            bottomPadding + 108,
+            bottomPadding + 86,
           ),
           child: _pageColumn(context),
         ),
@@ -2184,7 +2213,7 @@ class GradientWordmark extends StatelessWidget {
           fontFamily: 'Space Grotesk',
           color: Colors.white,
           fontSize: fontSize,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
           height: 1,
           letterSpacing: 0,
           decoration: TextDecoration.none,
@@ -2440,6 +2469,153 @@ class _StepCard extends StatelessWidget {
   }
 }
 
+class _HomeCityHero extends StatelessWidget {
+  const _HomeCityHero();
+
+  @override
+  Widget build(BuildContext context) {
+    final topOffset = MediaQuery.paddingOf(context).top + 10;
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(26)),
+      child: AspectRatio(
+        aspectRatio: 0.82,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const Image(
+              image: AssetImage('assets/images/matchie_city_hero.png'),
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.34),
+                    Colors.transparent,
+                    MatchiePalette.midnight.withValues(alpha: 0.54),
+                    MatchiePalette.midnight.withValues(alpha: 0.88),
+                  ],
+                  stops: const [0, 0.42, 0.76, 1],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              top: topOffset,
+              child: SizedBox(
+                height: 42,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const Center(child: GradientWordmark(fontSize: 26)),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Tooltip(
+                        message: 'Menu',
+                        child: InkWell(
+                          onTap: () => _showMatchieMenu(context),
+                          borderRadius: BorderRadius.circular(14),
+                          child: MatchieGlassSurface(
+                            compact: true,
+                            radius: 14,
+                            width: 38,
+                            height: 38,
+                            blur: false,
+                            child: const Icon(
+                              Icons.menu_rounded,
+                              color: MatchiePalette.text,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 18,
+              right: 18,
+              bottom: 24,
+              child: Column(
+                children: [
+                  MatchieGlassSurface(
+                    compact: true,
+                    active: true,
+                    radius: 18,
+                    width: 58,
+                    height: 58,
+                    blur: false,
+                    child: const Text(
+                      'CJ',
+                      style: TextStyle(
+                        color: MatchiePalette.purple,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 13),
+                  Text(
+                    'Chetan Jain',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.playfairDisplay(
+                      color: MatchiePalette.text,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    'Frontend Designer',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.playfairDisplay(
+                      color: MatchiePalette.text,
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        color: MatchiePalette.text,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Bangalore',
+                        style: GoogleFonts.playfairDisplay(
+                          color: MatchiePalette.text,
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic,
+                          height: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _AiEngineGraphicCard extends StatelessWidget {
   const _AiEngineGraphicCard();
 
@@ -2460,6 +2636,231 @@ class _AiEngineGraphicCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HomeDownloadFooter extends StatelessWidget {
+  const _HomeDownloadFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    return MatchieGlassSurface(
+      active: true,
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
+      child: Column(
+        children: const [
+          GradientWordmark(fontSize: 25),
+          SizedBox(height: 9),
+          Text(
+            'Your AI career tool.',
+            style: TextStyle(
+              fontFamily: 'Playfair Display',
+              color: MatchiePalette.muted,
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          SizedBox(height: 30),
+          _HomeFooterLinks(),
+          SizedBox(height: 30),
+          _StoreBadge(
+            icon: FontAwesomeIcons.apple,
+            eyebrow: 'DOWNLOAD ON THE',
+            label: 'App Store',
+          ),
+          SizedBox(height: 12),
+          _StoreBadge(
+            icon: FontAwesomeIcons.googlePlay,
+            eyebrow: 'GET IT ON',
+            label: 'Google Play',
+          ),
+          SizedBox(height: 28),
+          _HomeSocialRow(),
+          SizedBox(height: 20),
+          Text(
+            '© Matchie Group Ltd · Company No.\n17109242',
+            textAlign: TextAlign.center,
+            style: _PrototypeText.body,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeFooterLinks extends StatelessWidget {
+  const _HomeFooterLinks();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _FooterLinkColumn(
+                title: 'PRODUCT',
+                items: [
+                  'Features',
+                  'Pricing',
+                  'Enterprise',
+                  'Matchie on the Go',
+                ],
+              ),
+            ),
+            SizedBox(width: 18),
+            Expanded(
+              child: _FooterLinkColumn(
+                title: 'COMPANY',
+                items: ['About', 'Careers', 'News', 'Contact', 'Support'],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 30),
+        _FooterLinkColumn(
+          title: 'LEGAL',
+          items: ['Terms', 'Privacy', 'Cookies'],
+        ),
+      ],
+    );
+  }
+}
+
+class _FooterLinkColumn extends StatelessWidget {
+  const _FooterLinkColumn({required this.title, required this.items});
+
+  final String title;
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: MatchiePalette.text,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+            decoration: TextDecoration.none,
+          ),
+        ),
+        const SizedBox(height: 16),
+        for (final item in items) ...[
+          Text(item, textAlign: TextAlign.center, style: _PrototypeText.lead),
+          const SizedBox(height: 13),
+        ],
+      ],
+    );
+  }
+}
+
+class _StoreBadge extends StatelessWidget {
+  const _StoreBadge({
+    required this.icon,
+    required this.eyebrow,
+    required this.label,
+  });
+
+  final FaIconData icon;
+  final String eyebrow;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 252,
+      height: 64,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(icon, color: Colors.white, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      eyebrow,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        height: 1.06,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeSocialRow extends StatelessWidget {
+  const _HomeSocialRow();
+
+  @override
+  Widget build(BuildContext context) {
+    const icons = [
+      FontAwesomeIcons.xTwitter,
+      FontAwesomeIcons.linkedinIn,
+      FontAwesomeIcons.instagram,
+      FontAwesomeIcons.facebookF,
+      FontAwesomeIcons.tiktok,
+    ];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (final icon in icons) ...[
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.04),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Center(
+              child: FaIcon(icon, color: MatchiePalette.faint, size: 18),
+            ),
+          ),
+          if (icon != icons.last) const SizedBox(width: 10),
+        ],
+      ],
     );
   }
 }

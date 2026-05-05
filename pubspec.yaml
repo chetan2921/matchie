@@ -63,6 +63,7 @@ flutter:
   assets:
     - assets/images/matchie_ai_engine.jpeg
     - assets/images/matchie_home_art.jpeg
+    - assets/images/matchie_city_hero.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

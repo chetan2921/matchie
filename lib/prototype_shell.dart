@@ -29,7 +29,7 @@ class _MatchieShellState extends State<MatchieShell> {
     return MatchieMenuScope(
       onTabSelected: _selectTab,
       child: Scaffold(
-        extendBody: false,
+        extendBody: true,
         body: IndexedStack(index: _selectedIndex, children: screens),
         bottomNavigationBar: SafeArea(
           minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),
@@ -83,23 +83,49 @@ class MatchieFloatingNav extends StatelessWidget {
 
         return Center(
           heightFactor: 1,
-          child: MatchieGlassSurface(
-            active: true,
-            radius: 28,
+          child: Container(
             width: navWidth,
             height: 58,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                for (var i = 0; i < _items.length; i++)
-                  _NavButton(
-                    item: _items[i],
-                    selected: selectedIndex == i,
-                    size: buttonSize,
-                    onTap: () => onSelected(i),
-                  ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(29),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.34),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(29),
+              child: BackdropFilter(
+                filter: MatchieStyle.glassBlur(active: true),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: MatchieStyle.glassGradient(active: true),
+                    borderRadius: BorderRadius.circular(29),
+                    border: Border.all(
+                      color: MatchieStyle.glassBorder(active: true),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for (var i = 0; i < _items.length; i++)
+                        _NavButton(
+                          item: _items[i],
+                          selected: selectedIndex == i,
+                          size: buttonSize,
+                          onTap: () => onSelected(i),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         );

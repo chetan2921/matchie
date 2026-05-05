@@ -26,8 +26,8 @@ void main() {
     expect(find.bySemanticsLabel('Profile'), findsOneWidget);
     expect(find.bySemanticsLabel('Jobs'), findsOneWidget);
     expect(find.bySemanticsLabel('MatchieAI'), findsOneWidget);
-    expect(find.bySemanticsLabel('Matchie on the Go'), findsOneWidget);
-    expect(find.bySemanticsLabel('Support'), findsOneWidget);
+    expect(find.bySemanticsLabel('Matchie on the Go'), findsWidgets);
+    expect(find.bySemanticsLabel('Support'), findsWidgets);
     expect(find.bySemanticsLabel('Settings'), findsOneWidget);
     expect(find.byIcon(Icons.menu_rounded), findsOneWidget);
   });
